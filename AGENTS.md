@@ -46,7 +46,7 @@ The app is ad-hoc signed and not notarized, so users must use "Open Anyway" on f
 
 ## Website
 
-`docs/index.html` is the landing page, served by GitHub Pages from `docs/` on `main` at royxue.me/hyperlayer. It is a single static file with no build step. Its keyboard demo mirrors `NavigationLayer.groups`; update the `LAYER` table in the page when the layer changes. `docs/assets/mark.png` comes from `Resources/Mark.png` (written by `make icon`).
+`docs/index.html` is the landing page, served by GitHub Pages from `docs/` on `main` at royxue.github.io/hyperlayer. It is a single static file with no build step. Its keyboard demo mirrors `NavigationLayer.groups`; update the `LAYER` table in the page when the layer changes. `docs/assets/mark.png` comes from `Resources/Mark.png` (written by `make icon`).
 
 ## Debugging
 

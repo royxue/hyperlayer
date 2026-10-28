@@ -2,7 +2,7 @@
 
 <img src="Resources/AppIcon.png" width="128" alt="Hyperlayer icon">
 
-**[royxue.me/hyperlayer](https://royxue.me/hyperlayer)**
+**[royxue.github.io/hyperlayer](https://royxue.github.io/hyperlayer)**
 
 A tiny macOS menu bar app that turns Caps Lock into a Hyper key (Cmd+Ctrl+Opt+Shift) with a built-in navigation layer.
 
