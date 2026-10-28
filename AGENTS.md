@@ -33,6 +33,8 @@ make install         # release build, ad-hoc sign, reset Accessibility grant, in
 make uninstall
 ```
 
+The app icon is generated: `Resources/mark-source.png` (light mark on dark, drawn by the author) is turned into a mask and placed on a dark tile by `scripts/make-icon.swift`. Run `make icon` after changing the source, and commit the resulting `Resources/AppIcon.icns` and `Resources/AppIcon.png`.
+
 `make install` resets the Accessibility grant because each ad-hoc build has a new code hash, and macOS keeps showing the old grant as enabled even though it no longer applies.
 
 ## Debugging

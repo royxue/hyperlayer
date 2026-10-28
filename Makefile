@@ -2,16 +2,21 @@ PREFIX ?= /Applications
 APP = Hyperlayer.app
 BUNDLE_ID = com.royxue.hyperlayer
 
-.PHONY: build app install uninstall clean
+.PHONY: build app icon install uninstall clean
+
+# Regenerate Resources/AppIcon.icns after changing Resources/mark-source.png.
+icon:
+	swift scripts/make-icon.swift
 
 build:
 	swift build -c release
 
 app: build
 	@rm -rf $(APP)
-	@mkdir -p $(APP)/Contents/MacOS
+	@mkdir -p $(APP)/Contents/MacOS $(APP)/Contents/Resources
 	@cp .build/release/Hyperlayer $(APP)/Contents/MacOS/
 	@cp Info.plist $(APP)/Contents/
+	@cp Resources/AppIcon.icns $(APP)/Contents/Resources/
 	@codesign -f -s - --identifier $(BUNDLE_ID) $(APP)
 	@echo "Built $(APP)"
 

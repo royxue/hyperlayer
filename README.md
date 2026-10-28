@@ -1,5 +1,7 @@
 # Hyperlayer
 
+<img src="Resources/AppIcon.png" width="128" alt="Hyperlayer icon">
+
 A tiny macOS menu bar app that turns Caps Lock into a Hyper key (Cmd+Ctrl+Opt+Shift) with a built-in navigation layer.
 
 Works the same on built-in and external keyboards, without seizing any device, so media keys and everything else on your keyboard keep working.
