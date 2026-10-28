@@ -18,18 +18,17 @@ Hold Caps Lock and press:
 | `;` / `'` | Word back / forward (Opt+←/→) |
 | `I` / `O` | Line start / end (Cmd+←/→) |
 | `U` / `P` | Page Up / Page Down |
-| `Space` | Ctrl+Space (switch input source) |
-| `Esc` | Toggle Caps Lock |
+| `Esc` | Toggle Caps Lock (optional, on by default) |
+| `Space` | Ctrl+Space to switch input source (optional, off by default) |
 
 Physical modifiers are kept, so Caps Lock+Shift+H selects to the left. Every other key is sent as Hyper+key, ready for Raycast, Alfred, or app shortcuts.
 
-The layer can be turned off from the menu if you only want a plain Hyper key.
+The optional keys can be switched off so Hyper+Esc and Hyper+Space stay free for your own shortcuts (Hyper+Space is a popular Raycast hotkey). The whole layer can also be turned off if you only want a plain Hyper key.
 
-## Menu options
+## Settings
 
-- **Key Mapping…**: shows the layer as a floating cheat sheet in the middle of the screen (Esc or click away to close)
-- **Navigation Layer**: enable or disable the layer above
-- **Tap Caps Lock for Escape**: a quick tap without another key sends Escape
+- **Key Mapping…** (menu bar): a floating cheat sheet of the layer in the middle of the screen, with switches for the whole layer, the optional Esc and Space keys, and **Tap Caps Lock for Escape** (a quick tap without another key sends Escape). Esc or click away to close.
+- **Navigation Layer** (menu bar): the same layer switch, one click away
 - **Keyboards**: the keyboards Caps Lock is currently remapped on
 - **Launch at Login**
 

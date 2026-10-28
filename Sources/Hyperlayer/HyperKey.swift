@@ -12,16 +12,16 @@ final class HyperKey {
     private static let f18KeyCode: Int64 = 79
     private static let escapeKeyCode: CGKeyCode = 53
 
-    /// Send Escape when Caps Lock is pressed and released without another key.
-    var tapForEscape = false
-    /// Apply `NavigationLayer` mappings while hyper is held.
-    var layerEnabled = true
-
+    private let settings: Settings
     private var tap: CFMachPort?
     private var isHeld = false
     private var wasUsed = false
 
     var isRunning: Bool { tap.map { CGEvent.tapIsEnabled(tap: $0) } ?? false }
+
+    init(settings: Settings) {
+        self.settings = settings
+    }
 
     /// Installs the event tap. Fails if Accessibility access has not been granted.
     func start() -> Bool {
@@ -80,7 +80,7 @@ final class HyperKey {
             return pass
         }
 
-        if layerEnabled, let action = NavigationLayer.action(for: keyCode) {
+        if settings.layerEnabled, let action = NavigationLayer.action(for: keyCode, options: settings.layerOptions) {
             switch action {
             case let .key(target, flags):
                 // Keep physical modifiers (Shift+H selects left) but drop Caps Lock state.
@@ -105,7 +105,7 @@ final class HyperKey {
         let tapped = isHeld && !wasUsed
         isHeld = false
         wasUsed = false
-        if tapped && tapForEscape {
+        if tapped && settings.tapForEscape {
             let source = CGEventSource(stateID: .hidSystemState)
             for down in [true, false] {
                 CGEvent(keyboardEventSource: source, virtualKey: Self.escapeKeyCode, keyDown: down)?

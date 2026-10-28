@@ -11,12 +11,33 @@ enum LayerAction {
     case toggleCapsLock
 }
 
+/// Layer keys that can be switched on and off individually from the menu.
+enum LayerOption: String, CaseIterable {
+    case spaceSwitchesInput
+    case escTogglesCapsLock
+
+    var title: String {
+        switch self {
+        case .spaceSwitchesInput: "Caps Lock + Space Switches Input"
+        case .escTogglesCapsLock: "Caps Lock + Esc Toggles Caps Lock"
+        }
+    }
+
+    /// Space is off by default: Hyper+Space is a common launcher shortcut (e.g. Raycast).
+    var isOnByDefault: Bool { self == .escTogglesCapsLock }
+
+    var defaultsKey: String { "option.\(rawValue)" }
+}
+
 enum NavigationLayer {
     struct Entry {
         let keyCode: Int64
         let key: String          // label on the physical key
         let action: LayerAction
         let description: String
+        /// Entries with an option only apply while that option is turned on in the menu,
+        /// because they can clash with Hyper shortcuts people already use.
+        var option: LayerOption? = nil
     }
 
     struct Group {
@@ -45,16 +66,20 @@ enum NavigationLayer {
             Entry(keyCode: 35, key: "P", action: .key(121, nav), description: "Page down"),
         ]),
         Group(title: "Other", entries: [
-            Entry(keyCode: 49, key: "Space", action: .key(49, .maskControl), description: "Switch input source"),
-            Entry(keyCode: 53, key: "Esc", action: .toggleCapsLock, description: "Toggle Caps Lock"),
+            Entry(keyCode: 49, key: "Space", action: .key(49, .maskControl), description: "Switch input source",
+                  option: .spaceSwitchesInput),
+            Entry(keyCode: 53, key: "Esc", action: .toggleCapsLock, description: "Toggle Caps Lock",
+                  option: .escTogglesCapsLock),
         ]),
     ]
 
-    private static let actions: [Int64: LayerAction] = Dictionary(
-        uniqueKeysWithValues: groups.flatMap(\.entries).map { ($0.keyCode, $0.action) })
+    private static let entries: [Int64: Entry] = Dictionary(
+        uniqueKeysWithValues: groups.flatMap(\.entries).map { ($0.keyCode, $0) })
 
-    static func action(for keyCode: Int64) -> LayerAction? {
-        actions[keyCode]
+    static func action(for keyCode: Int64, options: Set<LayerOption>) -> LayerAction? {
+        guard let entry = entries[keyCode] else { return nil }
+        if let option = entry.option, !options.contains(option) { return nil }
+        return entry.action
     }
 
     static func toggleCapsLock() {

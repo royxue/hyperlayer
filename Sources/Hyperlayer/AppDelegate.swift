@@ -6,23 +6,15 @@ import ServiceManagement
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
 
-    private enum Defaults {
-        static let tapForEscape = "tapForEscape"
-        static let layerEnabled = "layerEnabled"
-    }
-
+    private let settings = Settings()
     private let remapper = KeyRemapper()
-    private let hyperKey = HyperKey()
+    private lazy var hyperKey = HyperKey(settings: settings)
     private let keyMapOverlay = KeyMapOverlay()
     private var statusItem: NSStatusItem!
     private var permissionTimer: Timer?
     private var signalSources: [DispatchSourceSignal] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        UserDefaults.standard.register(defaults: [Defaults.layerEnabled: true])
-        hyperKey.tapForEscape = UserDefaults.standard.bool(forKey: Defaults.tapForEscape)
-        hyperKey.layerEnabled = UserDefaults.standard.bool(forKey: Defaults.layerEnabled)
-
         setUpStatusItem()
         handleTerminationSignals()
         remapper.start()
@@ -86,8 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(item("Key Mapping…", #selector(showKeyMapping)))
-        menu.addItem(toggle("Navigation Layer", #selector(toggleLayer), on: hyperKey.layerEnabled))
-        menu.addItem(toggle("Tap Caps Lock for Escape", #selector(toggleTapForEscape), on: hyperKey.tapForEscape))
+        menu.addItem(toggle("Navigation Layer", #selector(toggleLayer), on: settings.layerEnabled))
         menu.addItem(keyboardsItem())
         menu.addItem(.separator())
 
@@ -135,17 +126,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - Actions
 
     @objc private func showKeyMapping() {
-        keyMapOverlay.toggle(layerEnabled: hyperKey.layerEnabled)
+        keyMapOverlay.toggle(settings: settings)
     }
 
     @objc private func toggleLayer() {
-        hyperKey.layerEnabled.toggle()
-        UserDefaults.standard.set(hyperKey.layerEnabled, forKey: Defaults.layerEnabled)
-    }
-
-    @objc private func toggleTapForEscape() {
-        hyperKey.tapForEscape.toggle()
-        UserDefaults.standard.set(hyperKey.tapForEscape, forKey: Defaults.tapForEscape)
+        settings.layerEnabled.toggle()
     }
 
     @objc private func toggleLaunchAtLogin() {

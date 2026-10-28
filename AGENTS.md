@@ -12,11 +12,12 @@ Two layers, no device seizure, no event re-injection:
 | File | Purpose |
 |------|---------|
 | `main.swift` | Entry point, single-instance check, `log()` |
-| `AppDelegate.swift` | Menu bar UI (rebuilt on each open), preferences, Accessibility polling, login item (`SMAppService`), signal handling |
+| `AppDelegate.swift` | Menu bar UI (rebuilt on each open), Accessibility polling, login item (`SMAppService`), signal handling |
+| `Settings.swift` | `ObservableObject` preferences in UserDefaults (layer on/off, tap for Escape, optional layer keys). Read directly by the event tap, bound by the overlay |
 | `KeyRemapper.swift` | Per-keyboard Caps Lock -> F18 mapping and keyboard list |
 | `HyperKey.swift` | Event tap and hyper state machine, tap-for-Escape |
-| `NavigationLayer.swift` | Layer key table (grouped, with labels) and Caps Lock toggle. Single source for both the event tap and the overlay |
-| `KeyMapOverlay.swift` | "Key Mapping…" floating panel (SwiftUI in a borderless `NSPanel`), closes on Esc or losing focus |
+| `NavigationLayer.swift` | Layer key table (grouped, with labels), `LayerOption` for keys that can be switched off (Esc, Space), and the Caps Lock toggle. Single source for both the event tap and the overlay |
+| `KeyMapOverlay.swift` | "Key Mapping…" floating panel (SwiftUI in a borderless `NSPanel`) with switches for all layer settings, closes on Esc or losing focus |
 
 ## Patterns
 
