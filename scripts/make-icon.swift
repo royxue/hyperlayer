@@ -1,8 +1,8 @@
 // Builds Resources/AppIcon.icns from Resources/mark-source.png (light mark on a dark background).
-// Usage: swift scripts/make-icon.swift
+// Usage (from the repo root): make icon
 import AppKit
 
-let root = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent().deletingLastPathComponent()
+let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 let resources = root.appendingPathComponent("Resources")
 let source = NSImage(contentsOf: resources.appendingPathComponent("mark-source.png"))!.cgImage(forProposedRect: nil, context: nil, hints: nil)!
 
@@ -84,6 +84,56 @@ for base in [16, 32, 128, 256, 512] {
 }
 let preview = NSBitmapImageRep(cgImage: renderIcon(size: 1024))
 try! preview.representation(using: .png, properties: [:])!.write(to: resources.appendingPathComponent("AppIcon.png"))
+
+// MARK: - Menu bar icon
+
+/// Grows the mark by `radius` source pixels (separable max filter), so thin outlines
+/// survive being shrunk to menu bar size.
+func thicken(_ image: CGImage, radius: Int) -> CGImage {
+    let w = image.width, h = image.height
+    var a = [UInt8](repeating: 0, count: w * h)
+    let ctx = CGContext(data: &a, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w,
+                        space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+    ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+    var b = a
+    for y in 0..<h {
+        for x in 0..<w {
+            var m: UInt8 = 0
+            for dx in max(0, x - radius)...min(w - 1, x + radius) { m = max(m, a[y * w + dx]) }
+            b[y * w + x] = m
+        }
+    }
+    for y in 0..<h {
+        for x in 0..<w {
+            var m: UInt8 = 0
+            for dy in max(0, y - radius)...min(h - 1, y + radius) { m = max(m, b[dy * w + x]) }
+            a[y * w + x] = m
+        }
+    }
+    return CGContext(data: &a, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w,
+                     space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!.makeImage()!
+}
+
+/// Black-on-transparent template image; AppKit tints it for light/dark menu bars.
+func renderMenuBarIcon(points: Int, scale: Int, mask: CGImage) -> CGImage {
+    let px = points * scale
+    let ctx = CGContext(data: nil, width: px, height: px, bitsPerComponent: 8, bytesPerRow: 0,
+                        space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    ctx.interpolationQuality = .high
+    let inset = CGFloat(scale) * 1
+    let rect = CGRect(x: inset, y: inset, width: CGFloat(px) - 2 * inset, height: CGFloat(px) - 2 * inset)
+    ctx.clip(to: rect, mask: mask)
+    ctx.setFillColor(color(0x000000)); ctx.fill(rect)
+    return ctx.makeImage()!
+}
+
+let menuMask = thicken(mask, radius: 7)
+for scale in [1, 2, 3] {
+    let name = scale == 1 ? "MenuBarIcon.png" : "MenuBarIcon@\(scale)x.png"
+    let rep = NSBitmapImageRep(cgImage: renderMenuBarIcon(points: 18, scale: scale, mask: menuMask))
+    rep.size = NSSize(width: 18, height: 18)
+    try! rep.representation(using: .png, properties: [:])!.write(to: resources.appendingPathComponent(name))
+}
 
 let iconutil = Process()
 iconutil.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")

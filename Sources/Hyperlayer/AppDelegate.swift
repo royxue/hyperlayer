@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private let remapper = KeyRemapper()
     private let hyperKey = HyperKey()
+    private let keyMapOverlay = KeyMapOverlay()
     private var statusItem: NSStatusItem!
     private var permissionTimer: Timer?
     private var signalSources: [DispatchSourceSignal] = []
@@ -59,7 +60,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func setUpStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "capslock.fill", accessibilityDescription: "Hyperlayer")
+        // MenuBarIcon only exists inside the app bundle; fall back to a symbol for `swift run`.
+        let icon = NSImage(named: "MenuBarIcon")
+            ?? NSImage(systemSymbolName: "capslock.fill", accessibilityDescription: nil)
+        icon?.isTemplate = true
+        icon?.size = NSSize(width: 18, height: 18)
+        icon?.accessibilityDescription = "Hyperlayer"
+        statusItem.button?.image = icon
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu
@@ -78,6 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         menu.addItem(.separator())
 
+        menu.addItem(item("Key Mapping…", #selector(showKeyMapping)))
         menu.addItem(toggle("Navigation Layer", #selector(toggleLayer), on: hyperKey.layerEnabled))
         menu.addItem(toggle("Tap Caps Lock for Escape", #selector(toggleTapForEscape), on: hyperKey.tapForEscape))
         menu.addItem(keyboardsItem())
@@ -125,6 +133,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     // MARK: - Actions
+
+    @objc private func showKeyMapping() {
+        keyMapOverlay.toggle(layerEnabled: hyperKey.layerEnabled)
+    }
 
     @objc private func toggleLayer() {
         hyperKey.layerEnabled.toggle()

@@ -6,7 +6,9 @@ BUNDLE_ID = com.royxue.hyperlayer
 
 # Regenerate Resources/AppIcon.icns after changing Resources/mark-source.png.
 icon:
-	swift scripts/make-icon.swift
+	@mkdir -p .build
+	swiftc -O scripts/make-icon.swift -o .build/make-icon
+	.build/make-icon
 
 build:
 	swift build -c release
@@ -16,7 +18,7 @@ app: build
 	@mkdir -p $(APP)/Contents/MacOS $(APP)/Contents/Resources
 	@cp .build/release/Hyperlayer $(APP)/Contents/MacOS/
 	@cp Info.plist $(APP)/Contents/
-	@cp Resources/AppIcon.icns $(APP)/Contents/Resources/
+	@cp Resources/AppIcon.icns Resources/MenuBarIcon*.png $(APP)/Contents/Resources/
 	@codesign -f -s - --identifier $(BUNDLE_ID) $(APP)
 	@echo "Built $(APP)"
 

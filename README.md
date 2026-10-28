@@ -25,6 +25,7 @@ The layer can be turned off from the menu if you only want a plain Hyper key.
 
 ## Menu options
 
+- **Key Mapping…**: shows the layer as a floating cheat sheet in the middle of the screen (Esc or click away to close)
 - **Navigation Layer**: enable or disable the layer above
 - **Tap Caps Lock for Escape**: a quick tap without another key sends Escape
 - **Keyboards**: the keyboards Caps Lock is currently remapped on

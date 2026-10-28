@@ -15,7 +15,8 @@ Two layers, no device seizure, no event re-injection:
 | `AppDelegate.swift` | Menu bar UI (rebuilt on each open), preferences, Accessibility polling, login item (`SMAppService`), signal handling |
 | `KeyRemapper.swift` | Per-keyboard Caps Lock -> F18 mapping and keyboard list |
 | `HyperKey.swift` | Event tap and hyper state machine, tap-for-Escape |
-| `NavigationLayer.swift` | Layer key table and Caps Lock toggle |
+| `NavigationLayer.swift` | Layer key table (grouped, with labels) and Caps Lock toggle. Single source for both the event tap and the overlay |
+| `KeyMapOverlay.swift` | "Key Mapping…" floating panel (SwiftUI in a borderless `NSPanel`), closes on Esc or losing focus |
 
 ## Patterns
 
@@ -33,7 +34,7 @@ make install         # release build, ad-hoc sign, reset Accessibility grant, in
 make uninstall
 ```
 
-The app icon is generated: `Resources/mark-source.png` (light mark on dark, drawn by the author) is turned into a mask and placed on a dark tile by `scripts/make-icon.swift`. Run `make icon` after changing the source, and commit the resulting `Resources/AppIcon.icns` and `Resources/AppIcon.png`.
+The app icon is generated: `Resources/mark-source.png` (light mark on dark, drawn by the author) is turned into a mask and placed on a dark tile by `scripts/make-icon.swift`. The same script writes the menu bar template images (`Resources/MenuBarIcon*.png`), with the mark thickened so its thin outlines survive at 18pt. Run `make icon` after changing the source, and commit everything it writes to `Resources/`.
 
 `make install` resets the Accessibility grant because each ad-hoc build has a new code hash, and macOS keeps showing the old grant as enabled even though it no longer applies.
 
