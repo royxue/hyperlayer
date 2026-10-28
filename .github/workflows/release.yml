@@ -17,7 +17,7 @@ jobs:
         run: make universal
 
       - name: Bundle and zip
-        run: make zip BIN=.build/apple/Products/Release/Hyperlayer VERSION="${GITHUB_REF_NAME#v}"
+        run: make zip BIN=.build/universal/Hyperlayer VERSION="${GITHUB_REF_NAME#v}"
 
       - name: Publish release
         env:
