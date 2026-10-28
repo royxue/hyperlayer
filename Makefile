@@ -1,8 +1,9 @@
 PREFIX ?= /Applications
 APP = Hyperlayer.app
 BUNDLE_ID = com.royxue.hyperlayer
+BIN ?= .build/release/Hyperlayer
 
-.PHONY: build app icon install uninstall clean
+.PHONY: build universal app zip icon install uninstall clean
 
 # Regenerate Resources/AppIcon.icns after changing Resources/mark-source.png.
 icon:
@@ -13,14 +14,26 @@ icon:
 build:
 	swift build -c release
 
-app: build
+universal:
+	swift build -c release --arch arm64 --arch x86_64
+
+# Bundles $(BIN) into $(APP). Set VERSION to stamp Info.plist (used by the release workflow).
+app: $(if $(filter .build/release/Hyperlayer,$(BIN)),build)
 	@rm -rf $(APP)
 	@mkdir -p $(APP)/Contents/MacOS $(APP)/Contents/Resources
-	@cp .build/release/Hyperlayer $(APP)/Contents/MacOS/
+	@cp $(BIN) $(APP)/Contents/MacOS/Hyperlayer
 	@cp Info.plist $(APP)/Contents/
 	@cp Resources/AppIcon.icns Resources/MenuBarIcon*.png $(APP)/Contents/Resources/
+	@if [ -n "$(VERSION)" ]; then \
+		/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(VERSION)" \
+			-c "Set :CFBundleVersion $(VERSION)" $(APP)/Contents/Info.plist; fi
 	@codesign -f -s - --identifier $(BUNDLE_ID) $(APP)
 	@echo "Built $(APP)"
+
+zip: app
+	@rm -f Hyperlayer.zip
+	@ditto -c -k --keepParent $(APP) Hyperlayer.zip
+	@echo "Built Hyperlayer.zip"
 
 # Each ad-hoc build has a new code hash, so the old Accessibility grant no longer
 # matches. Reset it so macOS prompts again instead of showing a stale "on" toggle.

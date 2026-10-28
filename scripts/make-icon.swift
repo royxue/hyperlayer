@@ -135,6 +135,17 @@ for scale in [1, 2, 3] {
     try! rep.representation(using: .png, properties: [:])!.write(to: resources.appendingPathComponent(name))
 }
 
+// White mark on transparent, at the source resolution, for the website.
+do {
+    let ctx = CGContext(data: nil, width: mask.width, height: mask.height, bitsPerComponent: 8, bytesPerRow: 0,
+                        space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    let rect = CGRect(x: 0, y: 0, width: mask.width, height: mask.height)
+    ctx.clip(to: rect, mask: mask)
+    ctx.setFillColor(color(0xFFFFFF)); ctx.fill(rect)
+    let rep = NSBitmapImageRep(cgImage: ctx.makeImage()!)
+    try! rep.representation(using: .png, properties: [:])!.write(to: resources.appendingPathComponent("Mark.png"))
+}
+
 let iconutil = Process()
 iconutil.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")
 iconutil.arguments = ["-c", "icns", iconset.path, "-o", resources.appendingPathComponent("AppIcon.icns").path]

@@ -38,6 +38,16 @@ The app icon is generated: `Resources/mark-source.png` (light mark on dark, draw
 
 `make install` resets the Accessibility grant because each ad-hoc build has a new code hash, and macOS keeps showing the old grant as enabled even though it no longer applies.
 
+## Release
+
+Push a tag: `git tag v0.X.Y && git push origin v0.X.Y`. `.github/workflows/release.yml` builds a universal binary (`make universal`), bundles it with the version stamped from the tag (`make zip BIN=... VERSION=...`), and publishes `Hyperlayer.zip` as a GitHub release. The website's download buttons point at `releases/latest/download/Hyperlayer.zip`, so keep that asset name.
+
+The app is ad-hoc signed and not notarized, so users must use "Open Anyway" on first launch.
+
+## Website
+
+`docs/index.html` is the landing page, served by GitHub Pages from `docs/` on `main` at royxue.me/hyperlayer. It is a single static file with no build step. Its keyboard demo mirrors `NavigationLayer.groups`; update the `LAYER` table in the page when the layer changes. `docs/assets/mark.png` comes from `Resources/Mark.png` (written by `make icon`).
+
 ## Debugging
 
 - Run the binary directly to see logs on stderr.

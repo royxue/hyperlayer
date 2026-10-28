@@ -2,6 +2,8 @@
 
 <img src="Resources/AppIcon.png" width="128" alt="Hyperlayer icon">
 
+**[royxue.me/hyperlayer](https://royxue.me/hyperlayer)**
+
 A tiny macOS menu bar app that turns Caps Lock into a Hyper key (Cmd+Ctrl+Opt+Shift) with a built-in navigation layer.
 
 Works the same on built-in and external keyboards, without seizing any device, so media keys and everything else on your keyboard keep working.
@@ -33,13 +35,19 @@ The layer can be turned off from the menu if you only want a plain Hyper key.
 
 ## Install
 
-Requires macOS 13 or later and Xcode command line tools.
+Requires macOS 13 or later.
+
+**Download**: grab [Hyperlayer.zip](https://github.com/royxue/hyperlayer/releases/latest/download/Hyperlayer.zip) from the latest release, unzip it and move Hyperlayer to Applications. The app is not notarized, so the first time you open it macOS will block it: go to System Settings → Privacy & Security and click **Open Anyway**.
+
+**From source** (needs Xcode command line tools):
 
 ```bash
 make install
 ```
 
-This builds the app, installs it to `/Applications/Hyperlayer.app` and launches it. On first launch, grant Accessibility access in System Settings → Privacy & Security → Accessibility. Hyperlayer starts working as soon as access is granted.
+This builds the app, installs it to `/Applications/Hyperlayer.app` and launches it.
+
+Either way, grant Accessibility access when asked (System Settings → Privacy & Security → Accessibility). Hyperlayer starts working as soon as access is granted.
 
 ```bash
 make uninstall
