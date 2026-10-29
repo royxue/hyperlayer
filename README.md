@@ -63,7 +63,7 @@ Quitting Hyperlayer restores Caps Lock to normal on every keyboard.
 
 - **Nothing happens**: check the menu for an Accessibility warning. After rebuilding, `make install` resets the old grant, so macOS asks again.
 - **Works except in password fields**: macOS turns on Secure Input in password fields and some terminals, which blocks all key remapping apps. The menu shows a warning while it is on.
-- **Logs**: run `/Applications/Hyperlayer.app/Contents/MacOS/Hyperlayer` from a terminal to see them.
+- **Logs**: `/usr/bin/log show --last 1h --predicate 'subsystem == "com.royxue.hyperlayer"' --style compact`, or run `/Applications/Hyperlayer.app/Contents/MacOS/Hyperlayer` from a terminal.
 
 ## License
 

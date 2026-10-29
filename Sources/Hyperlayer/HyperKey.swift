@@ -14,6 +14,7 @@ final class HyperKey {
 
     private let settings: Settings
     private var tap: CFMachPort?
+    private var runLoopSource: CFRunLoopSource?
     private var isHeld = false
     private var wasUsed = false
 
@@ -41,10 +42,30 @@ final class HyperKey {
             return false
         }
         tap = port
-        CFRunLoopAddSource(CFRunLoopGetMain(), CFMachPortCreateRunLoopSource(nil, port, 0), .commonModes)
+        runLoopSource = CFMachPortCreateRunLoopSource(nil, port, 0)
+        CFRunLoopAddSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
         CGEvent.tapEnable(tap: port, enable: true)
         log("event tap started")
         return true
+    }
+
+    /// macOS can disable or invalidate the tap without the callback ever hearing about
+    /// it (sleep, login, permission changes), leaving Caps Lock dead until a relaunch.
+    /// Called periodically to bring it back.
+    func ensureRunning() {
+        guard let port = tap else { return }
+        if !CFMachPortIsValid(port) {
+            log("event tap was invalidated, recreating")
+            if let runLoopSource { CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes) }
+            tap = nil
+            runLoopSource = nil
+            isHeld = false
+            _ = start()
+        } else if !CGEvent.tapIsEnabled(tap: port) {
+            log("event tap was disabled, re-enabling")
+            isHeld = false
+            CGEvent.tapEnable(tap: port, enable: true)
+        }
     }
 
     fileprivate func handle(_ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {

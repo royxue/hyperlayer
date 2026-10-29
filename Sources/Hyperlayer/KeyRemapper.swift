@@ -23,7 +23,7 @@ final class KeyRemapper {
     private static let srcKey = "HIDKeyboardModifierMappingSrc"
     private static let dstKey = "HIDKeyboardModifierMappingDst"
 
-    private let client = IOHIDEventSystemClientCreateSimpleClient(kCFAllocatorDefault)
+    private var client = IOHIDEventSystemClientCreateSimpleClient(kCFAllocatorDefault)
     private var notifyPort: IONotificationPortRef?
     private var iterators: [io_iterator_t] = []
     private var timer: Timer?
@@ -104,6 +104,10 @@ final class KeyRemapper {
     // MARK: - HID event system helpers
 
     private func keyboardServices() -> [IOHIDServiceClient] {
+        // A long-lived client can go stale after sleep, when USB keyboards re-enumerate:
+        // it keeps reporting the old services (and our mapping on them) while the new
+        // ones have none. A fresh client always sees what the system has right now.
+        client = IOHIDEventSystemClientCreateSimpleClient(kCFAllocatorDefault)
         guard let services = IOHIDEventSystemClientCopyServices(client) as? [IOHIDServiceClient] else { return [] }
         return services.filter {
             IOHIDServiceClientConformsTo($0, UInt32(kHIDPage_GenericDesktop), UInt32(kHIDUsage_GD_Keyboard)) != 0

@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let keyMapOverlay = KeyMapOverlay()
     private var statusItem: NSStatusItem!
     private var permissionTimer: Timer?
+    private var watchdog: Timer?
     private var signalSources: [DispatchSourceSignal] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -22,10 +23,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
         ) { [weak self] _ in
+            log("woke from sleep")
             self?.remapper.apply()
+            self?.hyperKey.ensureRunning()
         }
 
         startWhenTrusted()
+        watchdog = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            self?.hyperKey.ensureRunning()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

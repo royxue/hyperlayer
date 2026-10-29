@@ -51,6 +51,7 @@ The app is ad-hoc signed and not notarized, so users must use "Open Anyway" on f
 
 ## Debugging
 
-- Run the binary directly to see logs on stderr.
+- Logs go to stderr and the unified log: `/usr/bin/log show --last 1h --predicate 'subsystem == "com.royxue.hyperlayer"' --style compact` (in zsh, plain `log` is a builtin).
+- After sleep, USB keyboards re-enumerate. `KeyRemapper` creates a fresh HID client on every check because a long-lived one can keep reporting stale services, and `HyperKey.ensureRunning()` re-enables or recreates the event tap.
 - Check the current mapping: `hidutil property --get UserKeyMapping` (global) or `hidutil property --matching '{"Product":"<name>"}' --get UserKeyMapping` (per keyboard).
 - Secure Input (password fields, some terminals) blocks all event taps. `IsSecureEventInputEnabled()` drives the menu warning.
